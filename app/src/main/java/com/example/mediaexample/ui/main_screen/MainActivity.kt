@@ -1,4 +1,4 @@
-package com.example.mediaexample.ui
+package com.example.mediaexample.ui.main_screen
 
 import android.Manifest
 import android.app.Activity
@@ -8,15 +8,14 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mediaexample.databinding.ActivityMainBinding
 import com.example.mediaexample.manager.VideoManager
+import com.example.mediaexample.ui.surface.SurfaceActivity
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -51,12 +50,15 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             WRITE_EXTERNAL_STORAGE
         )
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             checkPermission(
                 Manifest.permission.MANAGE_EXTERNAL_STORAGE,
                 MANAGE_EXTERNAL_STORAGE
             )
         }
+
+        checkPermission(Manifest.permission.CAMERA, CAMERA)
 
         setupListeners()
     }
@@ -84,31 +86,11 @@ class MainActivity : AppCompatActivity() {
             buttonDecodeVideo.setOnClickListener {
 
                 val pickedFile = File(viewModel.pickedFileUri.value)
-                val pickedFileFullUri = Uri.parse(viewModel.pickedFileFullUri.value)
 
-                val fileDescriptor =
-                    contentResolver.openFileDescriptor(pickedFileFullUri, "r")
+                val intent = Intent(this@MainActivity, SurfaceActivity::class.java)
+                intent.putExtra("filePath", pickedFile.absolutePath)
+                startActivity(intent)
 
-                val outputDecodedVideoFile = File(
-                    getExternalFilesDir(Environment.DIRECTORY_MOVIES)
-                        ?.absolutePath + "/decodedVideo.txt"
-                )
-
-
-                Log.d("riko", outputDecodedVideoFile.absolutePath)
-
-                if (!outputDecodedVideoFile.exists()) {
-                    outputDecodedVideoFile.createNewFile()
-                }
-
-                Log.d("riko", "encodedPath: ${pickedFileFullUri}")
-
-                videoManager.decodeMP4(
-                    pickedFile.absolutePath,
-                    outputDecodedVideoFile.absolutePath
-                )
-
-                fileDescriptor?.close()
             }
         }
     }
@@ -134,7 +116,6 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val uriString = getRealPathFromURI(result.data?.data)
                 viewModel.savePickedFileUri(uriString, result.data?.data.toString())
-                Log.d("riko", "fileUri: ${result.data?.data}")
             }
         }
 
@@ -143,5 +124,6 @@ class MainActivity : AppCompatActivity() {
         private const val READ_EXTERNAL_STORAGE = 101
         private const val WRITE_EXTERNAL_STORAGE = 102
         private const val MANAGE_EXTERNAL_STORAGE = 103
+        private const val CAMERA = 104
     }
 }

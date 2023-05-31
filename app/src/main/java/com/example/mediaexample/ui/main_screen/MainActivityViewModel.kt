@@ -1,6 +1,5 @@
-package com.example.mediaexample.ui
+package com.example.mediaexample.ui.main_screen
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mediaexample.data.FilePreferencesRepository
@@ -15,7 +14,6 @@ class MainActivityViewModel(
     init {
         viewModelScope.launch {
             filePreferencesRepository.getPickedFileUri.collect {
-                Log.d("riko", "viewModel Uri: ${it.uri}")
                 pickedFileUri.value = it.uri
                 pickedFileFullUri.value = it.fullPathUri
             }
