@@ -14,9 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mediaexample.databinding.ActivityMainBinding
-import com.example.mediaexample.manager.VideoManager
+import com.example.mediaexample.ui.camera.CameraActivity
 import com.example.mediaexample.ui.surface.SurfaceActivity
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -25,7 +24,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainActivityViewModel by viewModel()
-    private val videoManager: VideoManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +89,11 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("filePath", pickedFile.absolutePath)
                 startActivity(intent)
 
+            }
+
+            buttonOpenCamera.setOnClickListener {
+                val intent = Intent(this@MainActivity, CameraActivity::class.java)
+                startActivity(intent)
             }
         }
     }

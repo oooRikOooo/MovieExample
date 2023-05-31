@@ -5,7 +5,7 @@ import android.view.SurfaceHolder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.mediaexample.databinding.ActivitySurfaceBinding
-import com.example.mediaexample.manager.VideoManager
+import com.example.mediaexample.manager.DecodeVideoManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -14,7 +14,7 @@ class SurfaceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySurfaceBinding
 
-    private val manager: VideoManager by inject()
+    private val manager: DecodeVideoManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -19,7 +19,6 @@ class MainActivityViewModel(
             }
         }
     }
-//    val filePreferencesFlow = filePreferencesRepository.getPickedFileUri
 
     val pickedFileUri = MutableStateFlow("")
     val pickedFileFullUri = MutableStateFlow("")

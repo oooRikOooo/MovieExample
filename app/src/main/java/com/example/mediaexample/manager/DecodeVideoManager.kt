@@ -7,7 +7,7 @@ import android.view.Surface
 import kotlinx.coroutines.delay
 
 
-class VideoManager {
+class DecodeVideoManager {
 
     suspend fun renderVideoFrames(filePath: String, surface: Surface) {
         val extractor = MediaExtractor()
@@ -81,10 +81,5 @@ class VideoManager {
             }
         }
         return -1
-    }
-
-
-    companion object {
-        private const val MIME_TYPE = "video/mp4"
     }
 }
