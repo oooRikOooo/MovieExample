@@ -18,13 +18,13 @@ class EncodeVideoManager {
         try {
             mediaCodec = MediaCodec.createEncoderByType("video/avc")
         } catch (e: Exception) {
-            Log.i("riko", e.message.toString())
+            e.printStackTrace()
         }
 
         val width = 1920
         val height = 1080
         val colorFormat = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
-        val videoBitrate = 500_000
+        val videoBitrate = 50_000_000
         val videoFrameRate = 30
         val iFrameInterval = 2
 
@@ -50,21 +50,23 @@ class EncodeVideoManager {
                 outPutByteBuffer = mediaCodec?.getOutputBuffer(index)
                 val outData = ByteArray(info.size)
                 outPutByteBuffer?.get(outData)
-                Log.d("riko", "timeInfo: ${info.presentationTimeUs}")
-                Log.d("riko", "outData: ${outData.size}")
+                Log.d(TAG, "timeInfo: ${info.presentationTimeUs}")
+                Log.d(TAG, "outData: ${outData.size}")
 
                 mediaCodec?.releaseOutputBuffer(index, false)
             }
 
             override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
-                Log.d("riko", "ERROR: ${e.message}")
+                Log.d(TAG, "ERROR: ${e.message}")
             }
 
             override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {
-                Log.d("riko", "format changed: $format")
+                Log.d(TAG, "format changed: $format")
             }
 
         })
+
+        mediaCodec?.start()
 
 
     }
@@ -73,5 +75,9 @@ class EncodeVideoManager {
         mediaCodec?.stop()
         mediaCodec?.release()
         encoderSurface?.release()
+    }
+
+    companion object {
+        private val TAG = this::class.java.simpleName
     }
 }

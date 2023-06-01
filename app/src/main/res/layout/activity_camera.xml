@@ -20,17 +20,6 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
-            android:id="@+id/imageViewChangeCamera"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="15dp"
-            android:src="@drawable/ic_flip_camera_ios_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
-
-        <ImageView
             android:id="@+id/imageViewPlay"
             android:layout_width="36dp"
             android:layout_height="36dp"

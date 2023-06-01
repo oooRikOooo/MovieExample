@@ -31,7 +31,6 @@ class CameraActivity : AppCompatActivity() {
     private var mCameraManager: CameraManager? = null
 
     private val cameraBack = 0
-    private val cameraFront = 1
 
     private val encodeVideoManager: EncodeVideoManager by inject()
 
@@ -51,9 +50,7 @@ class CameraActivity : AppCompatActivity() {
         if (myCameras?.get(cameraBack)?.isOpen == true) {
             myCameras?.get(cameraBack)?.closeCamera()
         }
-        if (myCameras?.get(cameraFront)?.isOpen == true) {
-            myCameras?.get(cameraFront)?.closeCamera()
-        }
+
         stopBackgroundThread();
         super.onPause()
 
@@ -81,19 +78,9 @@ class CameraActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         binding.apply {
-            imageViewChangeCamera.setOnClickListener {
-                if (myCameras?.get(cameraFront)?.isOpen == true) {
-                    myCameras?.get(cameraFront)?.closeCamera()
-                    myCameras?.get(cameraBack)?.openCamera()
-                    Log.d("riko", "cameraBack")
-                } else {
-                    myCameras?.get(cameraBack)?.closeCamera();
-                    myCameras?.get(cameraFront)?.openCamera();
-                }
-            }
-
             imageViewPlay.setOnClickListener {
                 encodeVideoManager.setupMediaCodec()
+
                 imageViewPlay.visibility = View.GONE
                 imageViewStop.visibility = View.VISIBLE
 
@@ -105,13 +92,7 @@ class CameraActivity : AppCompatActivity() {
                 imageViewStop.visibility = View.GONE
 
                 if (encodeVideoManager.mediaCodec != null) {
-                    myCameras?.get(cameraBack)?.let {
-                        if (it.isOpen) it.stopStreaming()
-                    } ?: run {
-                        if (myCameras?.get(cameraFront)?.isOpen == true) {
-                            myCameras?.get(cameraFront)?.stopStreaming()
-                        }
-                    }
+                    myCameras?.get(cameraBack)?.stopStreaming()
                 }
             }
         }
@@ -146,18 +127,18 @@ class CameraActivity : AppCompatActivity() {
             object : CameraDevice.StateCallback() {
                 override fun onOpened(camera: CameraDevice) {
                     mCameraDevice = camera
-                    Log.i("riko", "Open camera  with id:" + mCameraDevice!!.id)
+                    Log.d(TAG, "Open camera  with id:" + mCameraDevice!!.id)
                     createCameraPreviewSession()
                 }
 
                 override fun onDisconnected(camera: CameraDevice) {
                     mCameraDevice!!.close()
-                    Log.i("riko", "disconnect camera  with id:" + mCameraDevice!!.id)
+                    Log.d(TAG, "disconnect camera  with id:" + mCameraDevice!!.id)
                     mCameraDevice = null
                 }
 
                 override fun onError(camera: CameraDevice, error: Int) {
-                    Log.i("riko", "error! camera id:" + camera.id + " error:" + error)
+                    Log.d(TAG, "error! camera id:" + camera.id + " error:" + error)
                 }
             }
 
@@ -173,7 +154,9 @@ class CameraActivity : AppCompatActivity() {
             try {
                 val builder = mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
                 builder.addTarget(surface)
-                encodeVideoManager.encoderSurface?.let { builder.addTarget(it) }
+                encodeVideoManager.encoderSurface?.let {
+                    builder.addTarget(it)
+                }
                 mCameraDevice!!.createCaptureSession(
                     listOf(surface, encodeVideoManager.encoderSurface),
                     object : CameraCaptureSession.StateCallback() {
@@ -207,7 +190,7 @@ class CameraActivity : AppCompatActivity() {
                     mCameraManager?.openCamera(mCameraID, mCameraCallback, mBackgroundHandler)
                 }
             } catch (e: CameraAccessException) {
-                Log.i("riko", e.message.toString())
+                e.printStackTrace()
             }
         }
 
@@ -231,6 +214,10 @@ class CameraActivity : AppCompatActivity() {
             }
 
         }
+    }
+
+    companion object {
+        private val TAG = this::class.java.simpleName
     }
 
 }
