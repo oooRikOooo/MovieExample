@@ -102,11 +102,6 @@ class CameraActivity : AppCompatActivity() {
 
                 myCameras?.get(cameraBack)?.openCamera()
 
-//                mediaMuxerManager.setupMediaMuxer(
-//                    outputFile,
-//                    encodeVideoManager.mediaCodec!!.outputFormat,
-//                    encodeAudioManager.audioMediaCodec!!.outputFormat
-//                )
             }
 
             imageViewStop.setOnClickListener {
@@ -148,13 +143,11 @@ class CameraActivity : AppCompatActivity() {
             object : CameraDevice.StateCallback() {
                 override fun onOpened(camera: CameraDevice) {
                     mCameraDevice = camera
-                    Log.d(TAG, "Open camera  with id:" + mCameraDevice!!.id)
                     createCameraPreviewSession()
                 }
 
                 override fun onDisconnected(camera: CameraDevice) {
                     mCameraDevice!!.close()
-                    Log.d(TAG, "disconnect camera  with id:" + mCameraDevice!!.id)
                     mCameraDevice = null
                 }
 

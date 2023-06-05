@@ -34,7 +34,7 @@ class MediaMuxerManager(private val context: Context) {
     var audioFormat: MediaFormat? = null
 
     fun processFrame(info: BufferInfo, outData: ByteArray, frameType: FrameType) {
-        when(frameType){
+        when (frameType) {
             FrameType.AUDIO -> {
                 isFirstAudioFrameReceived = true
                 processAudioBytes(info, outData)
@@ -56,7 +56,7 @@ class MediaMuxerManager(private val context: Context) {
     }
 
     private fun processVideoBytes(info: BufferInfo, outData: ByteArray) {
-        if (mediaMuxer == null  && !isMediaMuxerStarted) return
+        if (mediaMuxer == null && !isMediaMuxerStarted) return
 
         if (defaultVideoTime == 0L) {
             defaultVideoTime = info.presentationTimeUs
@@ -68,7 +68,6 @@ class MediaMuxerManager(private val context: Context) {
 
         if (info.presentationTimeUs > currentVideoPresentationTimeUs) {
             mediaMuxer!!.writeSampleData(videoTrackIndex, buffer, info)
-            Log.d("VIDEO", "presentationTime: ${info.presentationTimeUs}")
             currentVideoPresentationTimeUs = info.presentationTimeUs
         }
     }
@@ -88,7 +87,6 @@ class MediaMuxerManager(private val context: Context) {
 
         if (info.presentationTimeUs >= 0 && info.presentationTimeUs > currentAudioPresentationTimeUs) {
             mediaMuxer!!.writeSampleData(audioTrackIndex, buffer, info)
-            Log.d("AUDIO", "presentationTime: ${info.presentationTimeUs}")
             currentAudioPresentationTimeUs = info.presentationTimeUs
         }
     }
@@ -125,14 +123,11 @@ class MediaMuxerManager(private val context: Context) {
         infoAudio.flags = MediaCodec.BUFFER_FLAG_END_OF_STREAM
         infoAudio.size = 0
         mediaMuxer!!.writeSampleData(audioTrackIndex, bufferAudio, infoAudio)
-
-        Log.d("riko", "finishRecordToFile")
     }
 
     fun releaseMediaMuxer() {
         finishRecordToFile()
 
-        Log.d("riko", "releaseMediaMuxer")
         audioTrackIndex = 0
         videoTrackIndex = 0
 
@@ -147,8 +142,8 @@ class MediaMuxerManager(private val context: Context) {
         mediaMuxer = null
     }
 
-    sealed class FrameType{
-        object VIDEO: FrameType()
-        object AUDIO: FrameType()
+    sealed class FrameType {
+        object VIDEO : FrameType()
+        object AUDIO : FrameType()
     }
 }

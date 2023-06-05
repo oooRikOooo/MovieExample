@@ -15,7 +15,7 @@ class EncodeAudioManager(private val mediaMuxerManager: MediaMuxerManager) {
     private var recordingThread: Thread? = null
     private var isRecording = false
 
-    private val SAMPLE_RATE = 44100
+    private val SAMPLE_RATE = 48000
     private val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
     private val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
     private val DEFAULT_BUFFER_SIZE = 4096
@@ -23,14 +23,11 @@ class EncodeAudioManager(private val mediaMuxerManager: MediaMuxerManager) {
 
     fun startAudioEncoding() {
 
-        val bufferSizeInBytes =
-            AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_CONFIG, AUDIO_FORMAT)
-
         val codecName = MediaFormat.MIMETYPE_AUDIO_AAC
         audioMediaCodec = MediaCodec.createEncoderByType(codecName)
-        audioFormat = MediaFormat.createAudioFormat(codecName, 44100, 2)
+        audioFormat = MediaFormat.createAudioFormat(codecName, 48000, 1)
 
-        audioFormat?.setInteger(MediaFormat.KEY_BIT_RATE, 64000)
+        audioFormat?.setInteger(MediaFormat.KEY_BIT_RATE, 32000)
         audioFormat?.setInteger(
             MediaFormat.KEY_AAC_PROFILE,
             MediaCodecInfo.CodecProfileLevel.AACObjectLC
@@ -110,7 +107,6 @@ class EncodeAudioManager(private val mediaMuxerManager: MediaMuxerManager) {
 
                 while (isEncoding) {
                     if (audioMediaCodec == null && audioRecord == null) {
-                        Log.d("riko", "null")
                         break
                     }
 
@@ -138,9 +134,6 @@ class EncodeAudioManager(private val mediaMuxerManager: MediaMuxerManager) {
                         val outData = ByteArray(bufferInfo.size)
                         outputBuffer?.get(outData)
 
-//                        Log.d("riko", "bufferInfo.size: ${bufferInfo.size}")
-
-//                            fileOutputStream.write(outData)
                         if (mediaMuxerManager.audioFormat == null)
                             mediaMuxerManager.audioFormat = audioMediaCodec?.outputFormat
 
