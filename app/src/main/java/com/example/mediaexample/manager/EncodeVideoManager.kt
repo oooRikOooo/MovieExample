@@ -1,14 +1,14 @@
 package com.example.mediaexample.manager
 
-import android.media.MediaCodec
-import android.media.MediaCodecInfo
-import android.media.MediaFormat
+import android.annotation.SuppressLint
+import android.media.*
 import android.util.Log
 import android.view.Surface
+import java.io.File
 import java.nio.ByteBuffer
 
 
-class EncodeVideoManager {
+class EncodeVideoManager(private val mediaMuxerManager: MediaMuxerManager) {
 
     var mediaCodec: MediaCodec? = null
     var encoderSurface: Surface? = null
@@ -26,7 +26,7 @@ class EncodeVideoManager {
         val colorFormat = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
         val videoBitrate = 50_000_000
         val videoFrameRate = 30
-        val iFrameInterval = 2
+        val iFrameInterval = 1
 
         val format = MediaFormat.createVideoFormat("video/avc", width, height)
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, colorFormat)
@@ -50,8 +50,11 @@ class EncodeVideoManager {
                 outPutByteBuffer = mediaCodec?.getOutputBuffer(index)
                 val outData = ByteArray(info.size)
                 outPutByteBuffer?.get(outData)
-                Log.d(TAG, "timeInfo: ${info.presentationTimeUs}")
-                Log.d(TAG, "outData: ${outData.size}")
+
+                if (mediaMuxerManager.videoFormat == null)
+                    mediaMuxerManager.videoFormat = mediaCodec?.outputFormat
+
+                mediaMuxerManager.processFrame(info, outData, MediaMuxerManager.FrameType.VIDEO)
 
                 mediaCodec?.releaseOutputBuffer(index, false)
             }
@@ -68,10 +71,9 @@ class EncodeVideoManager {
 
         mediaCodec?.start()
 
-
     }
 
-    fun stopEncoding() {
+    fun stopVideoEncoding() {
         mediaCodec?.stop()
         mediaCodec?.release()
         encoderSurface?.release()

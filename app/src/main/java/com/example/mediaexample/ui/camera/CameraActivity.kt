@@ -15,9 +15,15 @@ import android.util.Log
 import android.view.Surface
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.mediaexample.databinding.ActivityCameraBinding
+import com.example.mediaexample.manager.EncodeAudioManager
 import com.example.mediaexample.manager.EncodeVideoManager
+import com.example.mediaexample.manager.MediaMuxerManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.io.File
 
 
 class CameraActivity : AppCompatActivity() {
@@ -33,6 +39,8 @@ class CameraActivity : AppCompatActivity() {
     private val cameraBack = 0
 
     private val encodeVideoManager: EncodeVideoManager by inject()
+    private val encodeAudioManager: EncodeAudioManager by inject()
+    private val mediaMuxerManager: MediaMuxerManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,21 +87,34 @@ class CameraActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.apply {
             imageViewPlay.setOnClickListener {
+
+                lifecycleScope.launch(Dispatchers.IO) {
+
+                }
+
+                encodeAudioManager.startAudioEncoding()
+
                 encodeVideoManager.setupMediaCodec()
+
 
                 imageViewPlay.visibility = View.GONE
                 imageViewStop.visibility = View.VISIBLE
 
                 myCameras?.get(cameraBack)?.openCamera()
+
+//                mediaMuxerManager.setupMediaMuxer(
+//                    outputFile,
+//                    encodeVideoManager.mediaCodec!!.outputFormat,
+//                    encodeAudioManager.audioMediaCodec!!.outputFormat
+//                )
             }
 
             imageViewStop.setOnClickListener {
                 imageViewPlay.visibility = View.VISIBLE
                 imageViewStop.visibility = View.GONE
 
-                if (encodeVideoManager.mediaCodec != null) {
-                    myCameras?.get(cameraBack)?.stopStreaming()
-                }
+                myCameras?.get(cameraBack)?.stopStreaming()
+
             }
         }
     }
@@ -209,7 +230,13 @@ class CameraActivity : AppCompatActivity() {
                 } catch (e: CameraAccessException) {
                     e.printStackTrace()
                 }
-                encodeVideoManager.stopEncoding()
+
+                encodeAudioManager.stopEncoding()
+
+                encodeVideoManager.stopVideoEncoding()
+
+                mediaMuxerManager.releaseMediaMuxer()
+
                 closeCamera()
             }
 
