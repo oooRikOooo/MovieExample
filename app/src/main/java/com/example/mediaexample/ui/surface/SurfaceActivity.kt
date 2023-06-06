@@ -28,12 +28,8 @@ class SurfaceActivity : AppCompatActivity() {
 
         binding.surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
-                try {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        manager.renderVideoFrames(pickedFileAbsolutePath ?: "", holder.surface)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    manager.renderVideoFrames(pickedFileAbsolutePath ?: "", holder.surface)
                 }
             }
 
@@ -45,12 +41,17 @@ class SurfaceActivity : AppCompatActivity() {
             ) {
             }
 
-            override fun surfaceDestroyed(holder: SurfaceHolder) {
-
-            }
+            override fun surfaceDestroyed(holder: SurfaceHolder) {}
 
         })
 
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        manager.codec.stop()
+        manager.codec.release()
+        manager.extractor.release()
     }
 }

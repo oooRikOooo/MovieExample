@@ -23,7 +23,7 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainActivityViewModel by viewModel()
+    private var pickedFilePath = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
 
             buttonDecodeVideo.setOnClickListener {
 
-                val pickedFile = File(viewModel.pickedFileUri.value)
+                val pickedFile = File(pickedFilePath)
 
                 val intent = Intent(this@MainActivity, SurfaceActivity::class.java)
                 intent.putExtra("filePath", pickedFile.absolutePath)
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val uriString = getRealPathFromURI(result.data?.data)
-                viewModel.savePickedFileUri(uriString, result.data?.data.toString())
+                pickedFilePath = uriString
             }
         }
 

@@ -9,8 +9,11 @@ import kotlinx.coroutines.delay
 
 class DecodeVideoManager {
 
+    lateinit var extractor: MediaExtractor
+    lateinit var codec: MediaCodec
+
     suspend fun renderVideoFrames(filePath: String, surface: Surface) {
-        val extractor = MediaExtractor()
+        extractor = MediaExtractor()
         extractor.setDataSource(filePath)
 
         val trackIndex = selectTrack(extractor)
@@ -21,7 +24,7 @@ class DecodeVideoManager {
         extractor.selectTrack(trackIndex)
         val format = extractor.getTrackFormat(trackIndex)
 
-        val codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
+        codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
         codec.configure(format, surface, null, 0)
         codec.start()
 
@@ -65,10 +68,6 @@ class DecodeVideoManager {
                 break
             }
         }
-
-        codec.stop()
-        codec.release()
-        extractor.release()
     }
 
     private fun selectTrack(extractor: MediaExtractor): Int {

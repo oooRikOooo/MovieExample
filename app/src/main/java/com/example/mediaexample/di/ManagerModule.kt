@@ -8,5 +8,5 @@ val managerModule = module {
     factory { DecodeVideoManager() }
     factory { EncodeVideoManager(get()) }
     factory { EncodeAudioManager(get()) }
-    single { MediaMuxerManager(androidContext()) }
+    factory { MediaMuxerManager(androidContext()) }
 }
